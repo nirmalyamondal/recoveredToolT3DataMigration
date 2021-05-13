@@ -1,0 +1,73 @@
+devega.pimhosting.de => /var/www/clients/client10/web53/web/
+=====================================================
+
+1. Move all files 
+To 
+\fileadmin\devegaproduct\all_ks_files
+From
+uploads\ks_* >> 23 folders
+
+-----------------------
+2. Import mySql Data - 
+
+Source File: deVegaMigration\devega_kb_config.sql
+ssh root@devega.pimhosting.de
+cd /var/www/clients/client10/web53/web/
+mysql -u dbname -p -h localhost dbname < devega_kb_config.sql
+
+--------------------------------
+2. Set PID -
+Take Help of adminer.php
+
+UPDATE `tx_kbks_werteliste` SET `pid` = 107;
+UPDATE `tx_kbks_produkt` SET `pid` = 107;
+UPDATE `tx_kbks_infos` SET `pid` = 107;
+UPDATE `tx_kbks_haupttexte` SET `pid` = 107;
+UPDATE `tx_kbks_bestellung_angebot` SET `pid` = 107;
+UPDATE `tx_kbks_layoutkontur` SET `pid` = 107;
+UPDATE `tx_kbks_kalkulationsgruppe` SET `pid` = 107;
+UPDATE `tx_kbks_bilderextras` SET `pid` = 107;
+UPDATE `tx_kbks_extrafaktor` SET `pid` = 107;
+
+UPDATE `tx_kbkickstarter_fields` SET `pid` = 107;
+UPDATE `tx_kbkickstarter_tables` SET `pid` = 107;
+
+//UPDATE `tx_kbkickstarter_tables_fields_mm` SET `pid` = 107;
+//UPDATE `tx_kbkickstarter_tables_labelfields_mm` SET `pid` = 107;
+//UPDATE `tx_kbkickstarter_tables_sortfields_mm` SET `pid` = 107;
+
+----------------------------------------------------------------
+3. Execute FAL Script
+Refer file: deVegaFalFixOnline/deVegaFalFixReadMe.txt
+
+======================================================
+Some Helpful SQL Queries -
+
+DROP TABLE `tx_kbkickstarter_fields`, `tx_kbkickstarter_tables`, `tx_kbkickstarter_tables_fields_mm`, `tx_kbkickstarter_tables_labelfields_mm`, `tx_kbkickstarter_tables_sortfields_mm`, `tx_kbks_bestellung_angebot`, `tx_kbks_bilderextras`, `tx_kbks_extrafaktor`, `tx_kbks_haupttexte`, `tx_kbks_infos`, `tx_kbks_kalkulationsgruppe`, `tx_kbks_layoutkontur`, `tx_kbks_produkt`, `tx_kbks_werteliste`;
+----------------------------------------------------------------------------------------------------------------
+ALTER TABLE `tx_kbks_werteliste` CHANGE `l18n_parent` `l10n_parent` INT(11) NOT NULL DEFAULT '0';
+ALTER TABLE `tx_kbks_werteliste` CHANGE `l18n_diffsource` `l10n_diffsource` MEDIUMBLOB NOT NULL;
+
+ALTER TABLE `tx_kbks_produkt` CHANGE `l18n_parent` `l10n_parent` INT(11) NOT NULL DEFAULT '0';
+ALTER TABLE `tx_kbks_produkt` CHANGE `l18n_diffsource` `l10n_diffsource` MEDIUMBLOB NOT NULL;
+
+ALTER TABLE `tx_kbks_infos` CHANGE `l18n_parent` `l10n_parent` INT(11) NOT NULL DEFAULT '0';
+ALTER TABLE `tx_kbks_infos` CHANGE `l18n_diffsource` `l10n_diffsource` MEDIUMBLOB NOT NULL;
+
+ALTER TABLE `tx_kbks_haupttexte` CHANGE `l18n_parent` `l10n_parent` INT(11) NOT NULL DEFAULT '0';
+ALTER TABLE `tx_kbks_haupttexte` CHANGE `l18n_diffsource` `l10n_diffsource` MEDIUMBLOB NOT NULL;
+
+ALTER TABLE `tx_kbks_bestellung_angebot` CHANGE `l18n_parent` `l10n_parent` INT(11) NOT NULL DEFAULT '0';
+ALTER TABLE `tx_kbks_bestellung_angebot` CHANGE `l18n_diffsource` `l10n_diffsource` MEDIUMBLOB NOT NULL;
+
+ALTER TABLE `tx_kbks_layoutkontur` CHANGE `l18n_parent` `l10n_parent` INT(11) NOT NULL DEFAULT '0';
+ALTER TABLE `tx_kbks_layoutkontur` CHANGE `l18n_diffsource` `l10n_diffsource` MEDIUMBLOB NOT NULL;
+
+ALTER TABLE `tx_kbks_kalkulationsgruppe` CHANGE `l18n_parent` `l10n_parent` INT(11) NOT NULL DEFAULT '0';
+ALTER TABLE `tx_kbks_kalkulationsgruppe` CHANGE `l18n_diffsource` `l10n_diffsource` MEDIUMBLOB NOT NULL;
+
+ALTER TABLE `tx_kbks_bilderextras` CHANGE `l18n_parent` `l10n_parent` INT(11) NOT NULL DEFAULT '0';
+ALTER TABLE `tx_kbks_bilderextras` CHANGE `l18n_diffsource` `l10n_diffsource` MEDIUMBLOB NOT NULL;
+
+ALTER TABLE `tx_kbks_extrafaktor` CHANGE `l18n_parent` `l10n_parent` INT(11) NOT NULL DEFAULT '0';
+ALTER TABLE `tx_kbks_extrafaktor` CHANGE `l18n_diffsource` `l10n_diffsource` MEDIUMBLOB NOT NULL;

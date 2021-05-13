@@ -1,0 +1,239 @@
+########################################################################### 
+######################### deVega Migration STARTS (5 steps) ###############
+########################################################################### 
+=================================================================================================================
+
+Source: http://www.source.de/typo3/index.php
+Middle - Via: http://localhost/devega/typo3/
+Destination: http://devega.dest.de/typo3/
+
+=================================================================================================================
+
+devega.dest.de => /var/www/clients/client10/web53/web/
+
+=================================================================================================================
+
+1. Copy All Files :-
+From
+\uploads\ks_* >> 23 folders (approx)
+To 
+\fileadmin\devegaproduct\all_ks_files
+
+=================================================================================================================
+
+2. Export Old Production / Import Local Server mySql DB :- 
+Copy Source File: 
+From - F:\xampp\htdocs\deVegaMigration\dbSrc\dbSrc\c10devega_old_production.sql 
+To - F:\xampp\mysql\bin\c10devega_old_production.sql
+
+In DOS Command Prompt -
+
+$ F:
+$ cd xampp\mysql\bin\
+$ mysql -u root -p -h localhost devegaold < c10devega_old_production.sql
+ 
+Now export from Local http://localhost/phpmyadmin/db_export.php?db=devegaold (16 specified tables) and rename as devegaold_local_4_devega.sql
+Either Do the import Via phpMyAdmin.
+Copy Source File: 
+From - C:\Users\The PIM Company\Downloads\devegaold_local_4_devega.sql 
+To - F:\xampp\mysql\bin\devegaold_local_4_devega.sql
+Import via DOS Command Prompt -
+$ F:
+$ cd xampp\mysql\bin\
+$ mysql -u root -p -h localhost devega < devegaold_local_4_devega.sql
+ 
+=================================================================================================================
+
+2. SQL Queries to fix Table structure and data :-
+
+#Alter Tables to make compatible with 8.7
+ALTER TABLE `tx_kbks_werteliste` CHANGE `l18n_parent` `l10n_parent` INT(11) NOT NULL DEFAULT '0';
+ALTER TABLE `tx_kbks_werteliste` CHANGE `l18n_diffsource` `l10n_diffsource` MEDIUMBLOB NOT NULL;
+
+ALTER TABLE `tx_kbks_produkt` CHANGE `l18n_parent` `l10n_parent` INT(11) NOT NULL DEFAULT '0';
+ALTER TABLE `tx_kbks_produkt` CHANGE `l18n_diffsource` `l10n_diffsource` MEDIUMBLOB NOT NULL;
+
+ALTER TABLE `tx_kbks_infos` CHANGE `l18n_parent` `l10n_parent` INT(11) NOT NULL DEFAULT '0';
+ALTER TABLE `tx_kbks_infos` CHANGE `l18n_diffsource` `l10n_diffsource` MEDIUMBLOB NOT NULL;
+
+ALTER TABLE `tx_kbks_haupttexte` CHANGE `l18n_parent` `l10n_parent` INT(11) NOT NULL DEFAULT '0';
+ALTER TABLE `tx_kbks_haupttexte` CHANGE `l18n_diffsource` `l10n_diffsource` MEDIUMBLOB NOT NULL;
+
+ALTER TABLE `tx_kbks_bestellung_angebot` CHANGE `l18n_parent` `l10n_parent` INT(11) NOT NULL DEFAULT '0';
+ALTER TABLE `tx_kbks_bestellung_angebot` CHANGE `l18n_diffsource` `l10n_diffsource` MEDIUMBLOB NOT NULL;
+
+ALTER TABLE `tx_kbks_layoutkontur` CHANGE `l18n_parent` `l10n_parent` INT(11) NOT NULL DEFAULT '0';
+ALTER TABLE `tx_kbks_layoutkontur` CHANGE `l18n_diffsource` `l10n_diffsource` MEDIUMBLOB NOT NULL;
+
+ALTER TABLE `tx_kbks_kalkulationsgruppe` CHANGE `l18n_parent` `l10n_parent` INT(11) NOT NULL DEFAULT '0';
+ALTER TABLE `tx_kbks_kalkulationsgruppe` CHANGE `l18n_diffsource` `l10n_diffsource` MEDIUMBLOB NOT NULL;
+
+ALTER TABLE `tx_kbks_bilderextras` CHANGE `l18n_parent` `l10n_parent` INT(11) NOT NULL DEFAULT '0';
+ALTER TABLE `tx_kbks_bilderextras` CHANGE `l18n_diffsource` `l10n_diffsource` MEDIUMBLOB NOT NULL;
+
+ALTER TABLE `tx_kbks_extrafaktor` CHANGE `l18n_parent` `l10n_parent` INT(11) NOT NULL DEFAULT '0';
+ALTER TABLE `tx_kbks_extrafaktor` CHANGE `l18n_diffsource` `l10n_diffsource` MEDIUMBLOB NOT NULL;
+
+# Add more field
+ALTER TABLE `tx_kbks_infos` ADD `sorting` INT(10) NULL DEFAULT NULL AFTER `l10n_diffsource`;
+
+#Set proper Sysfolder/ PID :-
+#Page Title (Old > New)
+#1.   Infos  (103 > 110)
+UPDATE `tx_kbks_infos` SET `pid` = 110 WHERE `pid` = 103;
+#2.   Produkte  (87 > 108)
+UPDATE `tx_kbks_produkt` SET `pid` = 108 WHERE `pid` = 87;
+UPDATE `tx_kbks_layoutkontur` SET `pid` = 108 WHERE `pid` = 87;
+UPDATE `tx_kbks_bilderextras` SET `pid` = 108 WHERE `pid` = 87;
+#3.   Angebote/ Bestellungen (109/108 > 132/131)
+UPDATE `tx_kbks_bestellung_angebot` SET `pid` = 132 WHERE `pid` = 109;
+UPDATE `tx_kbks_bestellung_angebot` SET `pid` = 131 WHERE `pid` = 108;
+#4.   Tye  (89 > 111)
+UPDATE `tx_kbks_werteliste` SET `pid` = 111 WHERE `pid` = 89;
+#5.   Abheftvorrichtung (90 > 112)
+UPDATE `tx_kbks_werteliste` SET `pid` = 112 WHERE `pid` = 90;
+#6.   Verschlussart (91 > 113)
+UPDATE `tx_kbks_werteliste` SET `pid` = 113 WHERE `pid` = 91;
+#7.   Extras(92 > 114)
+UPDATE `tx_kbks_werteliste` SET `pid` = 114 WHERE `pid` = 92;
+#8.   Füllhöhe(93 > 9999 > 115) 
+UPDATE `tx_kbks_werteliste` SET `pid` = 9999 WHERE `pid` = 93;
+#We'll not execute this for Formate page
+#UPDATE `tx_kbks_werteliste` SET `pid` = 115 WHERE `pid` = 93;
+#9.   Papier(94 > 116)
+UPDATE `tx_kbks_werteliste` SET `pid` = 116 WHERE `pid` = 94;
+#10.  Druck(95 > 117)
+UPDATE `tx_kbks_extrafaktor` SET `pid` = 117 WHERE `pid` = 95;
+UPDATE `tx_kbks_werteliste` SET `pid` = 117 WHERE `pid` = 95;
+#11.  Auflage(96 > 118)
+UPDATE `tx_kbks_werteliste` SET `pid` = 118 WHERE `pid` = 96;
+#12.  Folienkaschierung(97 > 119)
+UPDATE `tx_kbks_werteliste` SET `pid` = 119 WHERE `pid` = 97;
+#13.  Veredelung(403 > 120)
+UPDATE `tx_kbks_werteliste` SET `pid` = 120 WHERE `pid` = 403;
+#14.  Lack(98 > 121)
+UPDATE `tx_kbks_werteliste` SET `pid` = 121 WHERE `pid` = 98;
+#15.  Prägung(99 > 122)
+UPDATE `tx_kbks_werteliste` SET `pid` = 122 WHERE `pid` = 99;
+#16.  Verpackung(100 > 123)
+UPDATE `tx_kbks_werteliste` SET `pid` = 123 WHERE `pid` = 100;
+#17.  Versand(101 > 124)
+UPDATE `tx_kbks_werteliste` SET `pid` = 124 WHERE `pid` = 101;
+#18.  Websites(358 > 125)
+UPDATE `tx_kbks_werteliste` SET `pid` = 125 WHERE `pid` = 358;
+#19.  Optionen(359 > 126)
+UPDATE `tx_kbks_werteliste` SET `pid` = 126 WHERE `pid` = 359;
+#20.  Haupttexte für Tabs(104 > 127)
+UPDATE `tx_kbks_haupttexte` SET `pid` = 127 WHERE `pid` = 104;
+#21.  Formate (115 > 128) 
+UPDATE `tx_kbks_werteliste` SET `pid` = 128 WHERE `pid` = 115;
+#22.  Preisgruppen (125 > 129)
+UPDATE `tx_kbks_kalkulationsgruppe` SET `pid` = 129 WHERE `pid` = 125;
+#23. Fix Füllhöhe(93 > 9999 > 115) 
+UPDATE `tx_kbks_werteliste` SET `pid` = 115 WHERE `pid` = 9999;
+
+####
+#UPDATE `tx_kbkickstarter_fields` SET `pid` = 107;
+#UPDATE `tx_kbkickstarter_tables` SET `pid` = 107;
+#UPDATE `tx_kbkickstarter_tables_fields_mm` SET `pid` = 107;
+#UPDATE `tx_kbkickstarter_tables_labelfields_mm` SET `pid` = 107;
+#UPDATE `tx_kbkickstarter_tables_sortfields_mm` SET `pid` = 107;
+
+=================================================================================================================
+3. Execute FAL Script :-
+Update file dbConnection.php with DB Name, Passsword and User.
+Execute these Following Commands below in DOS Command Prompt - -
+$ F:
+$ cd xampp\htdocs\deVegaMigration
+
+$ php toolBilderextras.php
+$ php toolLayoutkontur.php
+$ php toolWerteliste.php
+$ php toolProdukt.php
+
+=================================================================================================================
+
+4. Fix Sql Table Structure Post Migration for Relation :-
+
+#tx_kbks_layoutkontur
+ALTER TABLE `tx_kbks_layoutkontur` CHANGE `tx_kbks_lk_file` `tx_kbks_lk_file` INT(11) NULL DEFAULT NULL;
+#tx_kbks_bilderextras
+ALTER TABLE `tx_kbks_bilderextras` CHANGE `tx_kbks_px_image` `tx_kbks_px_image` INT(11) NULL DEFAULT NULL;
+#tx_kbks_werteliste
+ALTER TABLE `tx_kbks_werteliste` CHANGE `tx_kbks_slider_picture` `tx_kbks_slider_picture` INT(11) NULL DEFAULT NULL;
+#tx_kbks_produkt
+ALTER TABLE `tx_kbks_produkt` CHANGE `tx_kbks_p_layoutkontur` `tx_kbks_p_layoutkontur` INT(11) NULL DEFAULT NULL;
+ALTER TABLE `tx_kbks_produkt` CHANGE `tx_kbks_p_bild_top` `tx_kbks_p_bild_top` INT(11) NULL DEFAULT NULL;
+ALTER TABLE `tx_kbks_produkt` CHANGE `tx_kbks_p_bild` `tx_kbks_p_bild` INT(11) NULL DEFAULT NULL;
+ALTER TABLE `tx_kbks_produkt` CHANGE `tx_kbks_p_bild_hilte` `tx_kbks_p_bild_hilte` INT(11) NULL DEFAULT NULL;
+ALTER TABLE `tx_kbks_produkt` CHANGE `tx_kbks_p_bild_2_t_abheft` `tx_kbks_p_bild_2_t_abheft` INT(11) NULL DEFAULT NULL;
+ALTER TABLE `tx_kbks_produkt` CHANGE `tx_kbks_p_bild_3_t_abheft` `tx_kbks_p_bild_3_t_abheft` INT(11) NULL DEFAULT NULL;
+ALTER TABLE `tx_kbks_produkt` CHANGE `tx_kbks_p_bild_fensterstanzung` `tx_kbks_p_bild_fensterstanzung` INT(11) NULL DEFAULT NULL;
+ALTER TABLE `tx_kbks_produkt` CHANGE `tx_kbks_p_bild_fuellhoehe` `tx_kbks_p_bild_fuellhoehe` INT(11) NULL DEFAULT NULL;
+ALTER TABLE `tx_kbks_produkt` CHANGE `tx_kbks_p_bild_gest_abheft` `tx_kbks_p_bild_gest_abheft` INT(11) NULL DEFAULT NULL;
+ALTER TABLE `tx_kbks_produkt` CHANGE `tx_kbks_p_bild_gummizug` `tx_kbks_p_bild_gummizug` INT(11) NULL DEFAULT NULL;
+ALTER TABLE `tx_kbks_produkt` CHANGE `tx_kbks_p_bild_klettpunkt_magnet` `tx_kbks_p_bild_klettpunkt_magnet` INT(11) NULL DEFAULT NULL;
+ALTER TABLE `tx_kbks_produkt` CHANGE `tx_kbks_p_bild_vk_schlitze` `tx_kbks_p_bild_vk_schlitze` INT(11) NULL DEFAULT NULL;
+ALTER TABLE `tx_kbks_produkt` CHANGE `tx_kbks_p_bild_vk_tasche` `tx_kbks_p_bild_vk_tasche` INT(11) NULL DEFAULT NULL;
+ALTER TABLE `tx_kbks_produkt` CHANGE `tx_kbks_slider_bilder` `tx_kbks_slider_bilder` INT(11) NULL DEFAULT NULL;
+
+=================================================================================================================
+
+5. Export Local >> Import Development Server mySql DB :- 
+
+Now export from Local http://localhost/phpmyadmin/db_export.php?db=devega
+Copy Source File: 
+From - C:\Users\The PIM Company\Downloads\devega_local_4_dev.sql 
+To - /var/www/clients/client10/web53/web/deVegaMigration/devega_local_4_dev.sql
+ 
+ssh root@devega.pimhosting.de
+cd /var/www/clients/client10/web53/web/deVegaMigration/
+mysql -u c10devegadev -p -h localhost c10devegadev < devega_local_4_dev.sql
+
+=================================================================================================================
+
+Tables to Export/ Import: 
+#Structure Tables
+i.   tx_kbkickstarter_fields
+ii.  tx_kbkickstarter_tables
+iii. tx_kbkickstarter_tables_fields_mm
+iv.  tx_kbkickstarter_tables_labelfields_mm
+v.   tx_kbkickstarter_tables_sortfields_mm
+vi.  tx_kbkickstarter_typeconfig		
+vii. tx_kbkickstarter_typeconfig_fields_mm	
+#Data Tables
+viii.tx_kbks_bestellung_angebot
+ix.  tx_kbks_bilderextras
+x.   tx_kbks_extrafaktor
+xi.  tx_kbks_haupttexte
+xii. tx_kbks_infos
+xiii.tx_kbks_kalkulationsgruppe
+xiv. tx_kbks_layoutkontur
+xv.  tx_kbks_produkt
+xvi. tx_kbks_werteliste
+
+=================================================================================================================
+
+Some Helpful SQL Queries -
+
+DROP ###TABLE### `tx_kbkickstarter_fields`, `tx_kbkickstarter_tables`, `tx_kbkickstarter_tables_fields_mm`, `tx_kbkickstarter_tables_labelfields_mm`, `tx_kbkickstarter_tables_sortfields_mm`, `tx_kbks_bestellung_angebot`, `tx_kbks_bilderextras`, `tx_kbks_extrafaktor`, `tx_kbks_haupttexte`, `tx_kbks_infos`, `tx_kbks_kalkulationsgruppe`, `tx_kbks_layoutkontur`, `tx_kbks_produkt`, `tx_kbks_werteliste`, `tx_kbkickstarter_typeconfig`, `tx_kbkickstarter_typeconfig_fields_mm`;
+
+#Cleaning All Sys Files and References
+DELETE FROM sys_file WHERE pid = 107 AND metadata = 7777;
+DELETE FROM sys_file_reference WHERE pid = 107;
+
+#Table Specific
+tx_kbks_bilderextras:
+DELETE FROM sys_file_reference WHERE pid = 107 AND sorting = 8888;
+tx_kbks_produkt:
+DELETE FROM sys_file_reference WHERE pid = 107 AND sorting = 8885;
+tx_kbks_werteliste:
+DELETE FROM sys_file_reference WHERE pid = 107 AND sorting = 8886;
+tx_kbks_layoutkontur:
+DELETE FROM sys_file_reference WHERE pid = 107 AND sorting = 8887;
+
+=================================================================================================================
+
+########################################################################### 
+######################### deVega Migration ENDS ###########################
+########################################################################### 
